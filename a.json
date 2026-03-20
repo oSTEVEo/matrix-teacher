@@ -1,0 +1,198 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "tag": "socks",
+      "port": 10808,
+      "listen": "127.0.0.1",
+      "protocol": "mixed",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ],
+        "routeOnly": false
+      },
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "allowTransparent": false
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "proxy",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "147.45.255.17",
+            "port": 12412,
+            "users": [
+              {
+                "id": "791e00a1-2129-4103-b3c6-96f0c875dd70",
+                "email": "t@t.tt",
+                "security": "auto",
+                "encryption": "mlkem768x25519plus.native.0rtt.CxmGs5WNpHqfHKam0NLFIBHLdIJvU0ZgDYAdBklIkKoqnsIyFFvBKUgYhaMVGLEzhlsvptSCSpSs80ulGFfMgNQcxmbCCcDNGworxusmrjN8RzG8A6GMl0uzTyKmSzfFJBlntPWbYzwWSQaWDzSW2YxO4Hq3PMVPF3V0kdmtfPljORdlcfJN0GZOKvI4zhaZPpmcGmtdIxOQQGPHXcutzicsWuBJr8U-7PuCznoLXAZp1kSOijIc4aIYnSOkDRNos0UVlFtUalS3ify4DswBblJlpvIHEShGv9q9t3ePaoRy5XpXfMpd9cAuSOSXUAVc5ZesbjCa4zSWxxMVB6soncUy6XZafGZCVKLJ0AdexDcnnMYoKsAJvBcQR_w7ZhpzMNOrRiwb7Tau0HB41bfKMZM_ZOoATPIulNCgwek7UMqMR_ZFu0QE8jEGa4IJvGEjdAypk-Vb9vQtpiM8R-C2C3bGAXJswpG3BmRYMJkFpEcTS2cIFzsErYyF8RKiSlaYKyC58vFSTllZ41c4CHdP1YC03dJu7_yN1YWk-2wE0jUH1fOvuUICMbZCtWExE0eeHNJGNICN-CesubiRVLMoAAQQLyx1qfoAj2xn8BpEEpQ_Lok29mNY8hyPOZvAtWFU6EcdxWAmCROND7ZbQLG9bWcHcgNZY0NEaXQDv2iHdVq4xbWGCqg9aEPJBiYBxuyMcBsxwCl7nJDLP8MmGZhprRA9heRyxHEzcAYEViVCdOwarwqqLbJKy2q22ROTYDgC0Gib1UxrrnA0eUF8i7BoOwfBrJbDGlYcPVC0V-QszQNEiHiQcZYx_ug6hsQo67NiRKCtscOndRCJ5ndz6exweYpHfxt3R4Q4B-imrFU3sfJkZixzz3clYBmvuze9cYkWR_p2G7g2jJZHNQaDOHF-TjYw5dAh78VCDchSp0ZNJim6IyOcIHh7MUCQc0eaUlnN5fVt6-FXjjJYjpizzinDflokhbNcHSU5dJjB4MBr8rJMQ6E1GRN1gNQAAM2Ww9s5jXulFXAjwqSJDNyUr8KBj0zBbzNV6GJn3XMLM7rN-kYsi7QdUExgT_WDt8iuh1IVSTisFVgT70mBJjQuU6tFi5RqQjyIqBPLMjoW8QUd3yBh7ECtyCEKaQeoA1gZd4ATcse7KSZjA0wn5OhPZyFcPSZalbkbBoMkWBESRCSySISlpZY71VfF45aextbCd8g9LJigVwa2jbrNSNsAN1V_8wClT8IUCqLDvUeQMHd6ilBWNRuMYJNB0GGMIXgezKQgYksibgZGNNFwj3ME5BnCVfMZPUWkAbev7ztO-cNJgvouQAR9bmG2mlFZg7QuWkZdVAJbNcdOzCOInbJQwIUJ8KieqNl86KmK5lBBnwhWl7Ekc9pUovyJqSpyxXiOwztMBCOX9qZxsOOp7DR1sQa_o8FEXoA1XqtU6vY1H5B4-ehZShNWECq9HCso-fOCalYQBmBLezGi6-Owg9JpINOvb3CvKMJOJ4YA83YogsFpsyiGgpdoXiqbkxoOw1SDVMx9lE3xUQwZVcvLnhMOY9yeX5EtYJVWzi7Qx-I1dRNsOIY",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp"
+      },
+      "mux": {
+        "enabled": false,
+        "concurrency": -1
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api"
+      },
+      {
+        "type": "field",
+        "network": "tcp,udp",
+        "inboundTag": [
+          "socks",
+          "socks2"
+        ],
+        "outboundTag": "proxy",
+        "ip": [
+          "0.0.0.0/0"
+        ]
+      },
+      {
+        "type": "field",
+        "port": "50000-50099",
+        "outboundTag": "proxy",
+        "ip": [
+          "0.0.0.0/0"
+        ]
+      },
+      {
+        "type": "field",
+        "network": "tcp,udp",
+        "outboundTag": "direct",
+        "domain": [
+          "domain:2ip.ru"
+        ]
+      },
+      {
+        "type": "field",
+        "network": "tcp,udp",
+        "outboundTag": "proxy",
+        "domain": [
+          "domain:cloudflare-ech.com",
+          "domain:encryptedsni.com",
+          "domain:cloudflareaccess.com",
+          "domain:cloudflareapps.com",
+          "domain:cloudflarebolt.com",
+          "domain:cloudflareclient.com",
+          "domain:cloudflareinsights.com",
+          "domain:cloudflareok.com",
+          "domain:cloudflarepartners.com",
+          "domain:cloudflareportal.com",
+          "domain:cloudflarepreview.com",
+          "domain:cloudflareresolve.com",
+          "domain:cloudflaressl.com",
+          "domain:cloudflarestatus.com",
+          "domain:cloudflarestorage.com",
+          "domain:cloudflarestream.com",
+          "domain:cloudflaretest.com",
+          "domain:dis.gd",
+          "domain:discord-attachments-uploads-prd.storage.googleapis.com",
+          "domain:discord.app",
+          "domain:discord.co",
+          "domain:discord.com",
+          "domain:discord.design",
+          "domain:discord.dev",
+          "domain:discord.gift",
+          "domain:discord.gifts",
+          "domain:discord.gg",
+          "domain:discord.media",
+          "domain:discord.new",
+          "domain:discord.store",
+          "domain:discord.status",
+          "domain:discord-activities.com",
+          "domain:discordactivities.com",
+          "domain:discordapp.com",
+          "domain:discordapp.net",
+          "domain:discordcdn.com",
+          "domain:discordmerch.com",
+          "domain:discordpartygames.com",
+          "domain:discordsays.com",
+          "domain:discordsez.com",
+          "domain:discordstatus.com",
+          "domain:frankerfacez.com",
+          "domain:ffzap.com",
+          "domain:betterttv.net",
+          "domain:7tv.app",
+          "domain:7tv.io",
+          "domain:localizeapi.com",
+          "domain:unsplash.com"
+        ]
+      },
+      {
+        "type": "field",
+        "network": "tcp,udp",
+        "outboundTag": "proxy",
+        "domain": [
+          "domain:yt3.ggpht.com",
+          "domain:yt4.ggpht.com",
+          "domain:yt3.googleusercontent.com",
+          "domain:googlevideo.com",
+          "domain:jnn-pa.googleapis.com",
+          "domain:stable.dl2.discordapp.net",
+          "domain:wide-youtube.l.google.com",
+          "domain:youtube-nocookie.com",
+          "domain:youtube-ui.l.google.com",
+          "domain:youtube.com",
+          "domain:youtubeembeddedplayer.googleapis.com",
+          "domain:youtubekids.com",
+          "domain:youtubei.googleapis.com",
+          "domain:youtu.be",
+          "domain:yt-video-upload.l.google.com",
+          "domain:ytimg.com",
+          "domain:ytimg.l.google.com"
+        ]
+      },
+      {
+        "type": "field",
+        "network": "tcp,udp",
+        "outboundTag": "direct",
+        "ip": [
+          "0.0.0.0/0"
+        ]
+      },
+      {
+        "type": "field",
+        "inboundTag": [
+          "dns-module"
+        ],
+        "outboundTag": "proxy"
+      }
+    ]
+  }
+}
