@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Определитель матрицы</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        input {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            width: 150px;
+            text-align: center;
+            margin-right: 8px;
+        }
+        .matrix {
+            display: inline-block;
+            margin: 20px 0;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        td {
+            border: 1px solid #333;
+            padding: 8px 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .result {
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+        }
+        .ok { color: green; }
+        .fail { color: red; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Вычисление определителя</h2>
+        <button id="generateBtn">Сгенерировать матрицу</button>
+
+        <div id="matrixArea" class="hidden">
+            <p>Матрица:</p>
+            <div class="matrix" id="matrixTable"></div>
+            <div>
+                <label>Определитель = </label>
+                <input type="number" id="answerInput" placeholder="Введите число">
+                <button id="checkBtn">Проверить</button>
+            </div>
+            <div id="resultMessage" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';  // Адрес FastAPI сервера
+        let currentTaskId = null;
+
+        const generateBtn = document.getElementById('generateBtn');
+        const matrixArea = document.getElementById('matrixArea');
+        const matrixTable = document.getElementById('matrixTable');
+        const answerInput = document.getElementById('answerInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const resultMessage = document.getElementById('resultMessage');
+
+        // Генерация задания
+        generateBtn.addEventListener('click', async () => {
+            try {
+                // Показываем состояние загрузки
+                generateBtn.disabled = true;
+                generateBtn.textContent = 'Генерация...';
+                matrixArea.classList.add('hidden');
+                resultMessage.textContent = '';
+
+                const response = await fetch(`${API_BASE}/tasks/determinant?matrix_width=3&matrix_height=3`, {
+                    method: 'POST'
+                });
+                if (!response.ok) throw new Error('Ошибка сервера');
+                
+                const data = await response.json();
+                currentTaskId = data.task_id;
+                const matrix = data.question;  // matrix - это список списков
+
+                // Отображаем матрицу
+                renderMatrix(matrix);
+                
+                // Показываем область ответа
+                matrixArea.classList.remove('hidden');
+                answerInput.value = '';
+                answerInput.focus();
+            } catch (error) {
+                alert('Не удалось получить задание: ' + error.message);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Сгенерировать матрицу';
+            }
+        });
+
+        // Проверка ответа
+        checkBtn.addEventListener('click', async () => {
+            const value = parseFloat(answerInput.value);
+            if (isNaN(value)) {
+                resultMessage.textContent = 'Введите число';
+                resultMessage.className = 'result fail';
+                return;
+            }
+
+            try {
+                checkBtn.disabled = true;
+                checkBtn.textContent = 'Проверка...';
+                
+                const response = await fetch(`${API_BASE}/answers/${currentTaskId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value: value })
+                });
+                
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || 'Ошибка проверки');
+                }
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    resultMessage.textContent = '✅ Правильно!';
+                    resultMessage.className = 'result ok';
+                } else {
+                    resultMessage.textContent = '❌ Неверно, попробуйте ещё раз';
+                    resultMessage.className = 'result fail';
+                }
+            } catch (error) {
+                resultMessage.textContent = 'Ошибка: ' + error.message;
+                resultMessage.className = 'result fail';
+            } finally {
+                checkBtn.disabled = false;
+                checkBtn.textContent = 'Проверить';
+            }
+        });
+
+        function renderMatrix(matrix) {
+            let html = '<table>';
+            for (let row of matrix) {
+                html += '<tr>';
+                for (let cell of row) {
+                    html += `<td>${cell}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</table>';
+            matrixTable.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
