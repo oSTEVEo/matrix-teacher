@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-task_storage = TaskRepository()
+task_storage = TaskRepositoryInMemory()
 
 class DeterminantAnswerSchema(BaseModel):
     value: int

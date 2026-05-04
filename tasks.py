@@ -53,7 +53,20 @@ class SLAUTask(Task):
     def get_answer(self):
         return self._system_solutions.flatten().tolist()
 
-class TaskRepository:
+class TaskRepository(ABC):
+    @abstractmethod
+    def save(self, task: Task):
+        pass
+
+    @abstractmethod
+    def find_by_id(self, task_id: str) -> Optional[Task]:
+        pass
+
+    @abstractmethod
+    def remove(self, task_id: str):
+        pass
+
+class TaskRepositoryInMemory(TaskRepository):
     def __init__(self):
         self._storage: Dict[str, Task] = {}  # in-memory хранилище
 
