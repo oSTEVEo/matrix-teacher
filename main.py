@@ -7,6 +7,7 @@ import numpy as np
 from pydantic import BaseModel
 
 from tasks import *
+from utils import values_are_equal
 
 app = FastAPI()
 
@@ -65,7 +66,7 @@ def check_answer(task_uuid: str, answer: AnswerUnion):
     if type(solution) != type(answer.value):
         raise HTTPException(status_code=415, detail="Incorrect data type in answer field.")
 
-    if solution == answer.value:
+    if values_are_equal(solution, answer.value):
         return {"ok" : True}
     return {"ok" : False}
 
