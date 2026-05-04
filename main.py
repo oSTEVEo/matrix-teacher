@@ -1,6 +1,7 @@
 from typing import Union
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import numpy as np
 from pydantic import BaseModel
@@ -8,6 +9,15 @@ from pydantic import BaseModel
 from tasks import *
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],    # Change in prod
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 task_storage = TaskRepository()
 
 class DeterminantAnswerSchema(BaseModel):

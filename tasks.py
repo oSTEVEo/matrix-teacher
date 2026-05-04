@@ -32,7 +32,7 @@ class DeterminantTask(Task):
         return self.matrix.tolist()
 
     def get_answer(self):
-        return self._solution
+        return int(round(self._solution))
 
 class SLAUTask(Task):
     def __init__(self, coef_matrix: np.ndarray, depvar_matrix: np.ndarray):
