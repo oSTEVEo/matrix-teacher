@@ -42,10 +42,15 @@ def send_determinant(matrix_width:int=3, matrix_height:int=3):
     return {"task_id": task.id, "question": task.get_question()}
 
 @app.post("/tasks/slau", tags=["Users"], summary="Получить задание по решению СЛАУ")
-def send_slau(variables:int=3):
-    coefficients = np.random.randint(-10, 10, (variables, variables))
-    biases = np.random.randint(-10, 10, (variables, 1))
-    task = SLAUTask(coefficients, biases)
+def send_slau(variables: int = 3):
+    while True:
+        coefficients = np.random.randint(-10, 10, (variables, variables))
+        biases = np.random.randint(-10, 10, (variables, 1))
+        try:
+            task = SLAUTask(coefficients, biases)
+            break
+        except np.linalg.LinAlgError:
+            pass
     task_storage.save(task)
     return {"task_uuid": task.id, "question": task.get_question()}
 

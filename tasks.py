@@ -42,7 +42,10 @@ class SLAUTask(Task):
         self._system_solutions = self._solve_system()
 
     def _solve_system(self):
-        return np.linalg.solve(self.coef_matrix, self.depvar_matrix)
+        try:
+            return np.linalg.solve(self.coef_matrix, self.depvar_matrix)
+        except:
+            raise
 
     def get_question(self):
         return {"coefficients": self.coef_matrix.tolist(), "biases": self.depvar_matrix.tolist()}
